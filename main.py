@@ -73,8 +73,13 @@ class Game:
                     self.running = False
                 # TODO(F2): 스페이스 키를 누르면 self.player.shoot() 으로 총알을 만들어
                 #           self.bullets 와 self.all_sprites 두 그룹에 넣을 것. (게임 오버 중에는 쏘지 않게)
+                elif event.key == pygame.K_SPACE:
+                    if not self.game_over:
+                        bullet = self.player.shoot()
+                        self.bullets.add(bullet)
+                        self.all_sprites.add(bullet)
                 # TODO(F5): 게임 오버 상태에서 R 키를 누르면 self.reset() 으로 새 판을 시작할 것.
-
+                
     def handle_title_event(self, event):
         """시작 화면의 입력: SPACE 면 새 판 시작, ESC 면 종료. (적 생성·발사 없음)"""
         if event.type == pygame.KEYDOWN:
