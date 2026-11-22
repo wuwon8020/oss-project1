@@ -17,14 +17,18 @@ def load_high_score():
     """HIGHSCORE_FILE 에서 최고 점수를 읽어 돌려준다."""
     # TODO(F5): 파일에서 최고 점수를 읽어 int 로 반환할 것.
     #           파일이 없거나 내용이 숫자가 아니면 0 을 반환할 것.
-    return 0
-
+    try:
+        with open(HIGHSCORE_FILE, 'r') as f:
+            return int(f.read())
+             
+    except (FileNotFoundError, ValueError):
+        return 0
 
 def save_high_score(score):
     """최고 점수를 HIGHSCORE_FILE 에 저장한다."""
     # TODO(F5): score 를 파일에 저장할 것. (다음 실행 때 load_high_score() 로 읽을 수 있게)
-    pass
-
+    with open(HIGHSCORE_FILE, 'w') as f:
+        f.write(str(score))
 
 class Game:
     def __init__(self):
@@ -79,7 +83,10 @@ class Game:
                         self.bullets.add(bullet)
                         self.all_sprites.add(bullet)
                 # TODO(F5): 게임 오버 상태에서 R 키를 누르면 self.reset() 으로 새 판을 시작할 것.
-                
+                elif event.key == pygame.K_r:
+                    if self.game_over:
+                        self.reset()
+        
     def handle_title_event(self, event):
         """시작 화면의 입력: SPACE 면 새 판 시작, ESC 면 종료. (적 생성·발사 없음)"""
         if event.type == pygame.KEYDOWN:
@@ -127,6 +134,9 @@ class Game:
         """게임 오버 처리."""
         self.game_over = True
         # TODO(F5): 이번 점수가 최고 점수보다 높으면 self.high_score 를 바꾸고 save_high_score() 로 저장할 것.
+        if self.score > self.high_score:
+            self.high_score = self.score
+            save_high_score(self.high_score)
 
     # ---------------- 그리기 ----------------
     def draw_text(self, text, font, color, **position):
@@ -169,9 +179,10 @@ class Game:
         cx = WIDTH // 2
         # TODO(F4): 화면 가운데에 "GAME OVER" 와 이번 판 점수를 표시할 것.
         self.draw_text("GAME OVER", self.big_font, YELLOW, center=(cx, cx))
-        self.draw_text(f"SCORE: {self.score}", pygame.font.Font(None, 48), YELLOW, center=(cx, cx+60))
+        self.draw_text(f"SCORE: {self.score}", pygame.font.Font(None, 48), YELLOW, center=(cx, cx+80))
         # TODO(F5): 최고 점수("HIGH SCORE: 300")와 재시작 안내("Press R to restart")도 표시할 것.
-        pass
+        self.draw_text(f"HIGH SCORE: {self.high_score}", pygame.font.Font(None, 48), YELLOW, center=(cx, cx+120))
+        self.draw_text(f"Press R to restart", self.big_font, YELLOW, center=(cx, cx+200))
 
     # ---------------- 게임 루프 ----------------
     def step(self):
